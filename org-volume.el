@@ -29,6 +29,25 @@ default site by context.")
                  (error "Cannot find a site %s in org-volume-site-alist" site-id))
              params)))
 
+(defun org-dblock-write:volume-toc (params)
+  (let ((title (org-entry-get nil "VOLUME_TITLE"))
+        (publisher (org-entry-get nil "VOLUME_PUBLISHER"))
+        (isbn (org-entry-get nil "ISBN_13")))
+    (unless isbn
+      (user-error "The entry needs to be set a ISBN_13 property"))
+    (if publisher
+        (org-volume--insert-org-toc
+         :publisher publisher
+         :title title)
+      (org-volume--ottobib isbn
+        (cl-function
+         (lambda (&key data &allow-other-keys)
+           (if-let (publisher (cdr (assoc "publisher" data)))
+               (org-volume--insert-org-toc
+                :publisher publisher
+                :title title)
+             (error "No publisher data is available for %s" isbn))))))))
+
 ;;;; Convenient commands for the user
 
 (defun org-volume-update-entry-from-dblock ()
@@ -47,8 +66,13 @@ default site by context.")
                         (buffer-substring-no-properties (point) (line-end-position))))))
         (unless (f-directory-p org-download-image-dir)
           (make-directory org-download-image-dir))
-        (-some->> (getprop "Title")
-          (org-edit-headline))
+        (when-let (title (getprop "Title"))
+          (org-entry-put nil "VOLUME_TITLE" title)
+          (if-let (subtitle (getprop "Subtitle"))
+              (org-edit-headline (concat title " - " subtitle))
+            (org-edit-headline title)))
+        (-some->> (getprop "Publisher")
+          (org-entry-put nil "VOLUME_PUBLISHER"))
         (-some->> (getprop "Isbn13")
           (org-entry-put nil "ISBN_13"))
         (when-let (type (getprop "Print Type"))
@@ -67,78 +91,28 @@ default site by context.")
                 (goto-char pos))
               (org-download-image thumbnail))))))))
 
-;;;; Internal utility functions
+;;;; Internal functions
 
-(defun org-volume--json-parse-1 ()
-  (json-parse-buffer :object-type 'alist :array-type 'list :null-object nil))
+(cl-defun org-volume--insert-org-toc (&key publisher title)
+  (org-volume--fetch-details-from-publisher
+   publisher title
+   (cl-function
+    (lambda (&key data response &allow-other-keys)
+      (insert "For details, visit " (request-response-url response) "\n\n")
+      (if-let (toc (plist-get data :toc))
+          (insert (org-volume--toc-to-org-list toc))
+        (error "TOC was not returned"))))))
 
-;;;; Backends
-
-;;;;; Google Books for searching books
-
-(defun org-volume-google-books (params)
-  (let ((query (org-link-display-format (org-get-heading t t t t)))
-        (lang (or (plist-get params :lang) "en"))
-        (post-filter (plist-get params :filter))
-        (endpoint "https://www.googleapis.com/books/v1/volumes"))
-    (request endpoint
-      :params `((q . ,query)
-                (langRestrict . ,lang))
-      :sync t
-      :error (lambda () (message "Error querying %s" query))
-      :parser #'org-volume--json-parse-1
-      :complete
-      (cl-function
-       (lambda (&key data &allow-other-keys)
-         (dolist (item (alist-get 'items data))
-           (let ((start (point)))
-             (org-volume--google-books-insert-item item)
-             (when (and post-filter
-                        (not (string-match-p (regexp-quote post-filter)
-                                             (buffer-substring-no-properties start (point)))))
-               (delete-region start (point)))))
-         (backward-delete-char 2))))))
-
-(defun org-volume--google-books-insert-item (item)
-  (let* ((v (alist-get 'volumeInfo item))
-         (imageLinks (alist-get 'imageLinks v))
-         (identifiers (alist-get 'industryIdentifiers v))
-         (isbn13 (-some->> identifiers
-                   (-find (lambda (al) (string= "ISBN_13" (alist-get 'type al))))
-                   (alist-get 'identifier)))
-         (isbn10 (-some->> identifiers
-                   (-find (lambda (al) (string= "ISBN_10" (alist-get 'type al))))
-                   (alist-get 'identifier))))
-    (cl-labels
-        ((dl (key value) (when value (insert (format "- %s :: %s\n"
-                                                     (->> (format "%s" key)
-                                                          (replace-regexp-in-string "-" " ")
-                                                          (capitalize))
-                                                     value)))))
-      (let-alist v
-        (dl 'title (concat \.title (if \.subtitle
-                                       (concat " - " \.subtitle)
-                                     "")))
-        (dl 'authors (string-join \.authors " / "))
-        (dl 'publisher \.publisher)
-        (dl 'published-date \.publishedDate)
-        (dl 'pages \.pageCount)
-        (dl 'language \.language)
-        (dl 'categories (string-join \.categories ", "))
-        (dl 'print-type \.printType)
-        (dl 'isbn13 isbn13)
-        (dl 'isbn10 isbn10)
-        (dl 'thumbnail (or (alist-get 'smallThumbnail imageLinks)
-                           (alist-get 'thumbnail imageLinks)))
-        (insert (if \.description
-                    (concat "\n" \.description "\n")
-                  ""))))
-    (insert "\n")))
-
-;;;; OttoBib for ISBN search
-
-(defun org-volume-ottobib (isbn)
-  (format "https://www.ottobib.com/isbn/%s/bibtex" isbn))
+(defun org-volume--toc-to-org-list (list)
+  (cl-labels
+      ((go
+        (level x)
+        (cl-etypecase x
+          (string (replace-regexp-in-string
+                   (char-to-string #o240) " "
+                   (concat (apply #'concat (-repeat level " ")) "+ " x "\n")))
+          (list (mapconcat (-partial #'go (1+ level)) x "")))))
+    (go -1 list)))
 
 (provide 'org-librarian-block)
 ;;; org-librarian-block.el ends here
