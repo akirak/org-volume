@@ -1,22 +1,71 @@
 ;;; org-volume-book.el --- Book search API -*- lexical-binding: t -*-
 
+;; Copyright (C) 2021 Akira Komamura
+
+;; Author: Akira Komamura <akira.komamura@gmail.com>
+;; Version: 0.1
+;; URL: https://github.com/akirak/org-volume
+
+;; This file is not part of GNU Emacs.
+
+;;; License:
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; This library provides support for book search for org-volume.
+
+;;; Code:
+
+(require 'request)
+
 (require 'org-volume-utils)
-(require 'org)
-(require 'ol)
+
+(declare-function xml-parse-tag "xml")
 
 ;;;; Google Books for searching books
 
+(defconst org-volume-google-books-v1-api-endpoint
+  "https://www.googleapis.com/books/v1/volumes")
+
 (defun org-volume-google-books (params)
-  "Insert the response of Google Books into an Org dynamic block."
-  (let ((query (org-link-display-format (org-get-heading t t t t)))
-        (lang (or (plist-get params :lang) "en"))
+  "Google Books provider for the \"volume\" dynamic block.
+
+This function retrieves information on the title from Google
+Books API v1 and insert the metadata into the buffer in an Org
+format.
+
+PARAMS is a plist. It supports the following parameters:
+
+* `:q': An unescaped search query. This is usually retrieved from
+  the current Org heading.
+
+* `:lang': Language of the volumes, e.g. \"en\".
+
+* `:filter': Explicit text filter. Google Books can return a lot
+  of unintended items, so you can use this text to filter the
+  result based the actual Org output."
+  (let ((query (plist-get params :q))
+        (lang (plist-get params :lang))
         (post-filter (plist-get params :filter))
-        (endpoint "https://www.googleapis.com/books/v1/volumes"))
+        (endpoint org-volume-google-books-v1-api-endpoint))
     (request endpoint
       :params `((q . ,query)
                 (langRestrict . ,lang))
       :sync t
-      :error (lambda () (message "Error querying %s" query))
+      :error (lambda () (message "Error querying %s at Google Books v1" query))
       :parser #'org-volume--parse-json-1
       :complete
       (cl-function
@@ -31,7 +80,7 @@
          (backward-delete-char 2))))))
 
 (defun org-volume--google-books-insert-item (item)
-  "Insert information on an item."
+  "Insert information on an ITEM."
   (let* ((v (alist-get 'volumeInfo item))
          (imageLinks (alist-get 'imageLinks v))
          (identifiers (alist-get 'industryIdentifiers v))
@@ -93,10 +142,11 @@ The response data is converted from BibTeX to an alist."
      (with-temp-buffer
        (insert content)
        (goto-char (point-min))
-       ;; TODO: Use something else to prevent the message "Replace N occurrences"" "
-       (replace-string "\\n" "\n")
+       (save-excursion
+         (while (search-forward "\\n" nil t)
+           (replace-match "\n")))
        (org-volume--parse-bibtex)))
-    (x (error "Parse failure: " x))))
+    (x (error "Parse failure: %s" x))))
 
 (provide 'org-volume-book)
 ;;; org-volume-book.el ends here
