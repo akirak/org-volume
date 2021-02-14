@@ -95,6 +95,11 @@ When you run =C-c C-c= on the dynamic block, it finds a web page for the title o
 You can add support for more publishers by extending =org-volume-publisher-site-list=.
 Some publishers may block bots from accessing their web sites, so you cannot retrieve TOCs for books from those publishers.
 Also check terms of use of the web sites you consider scraping and stick with common practices of ethical web scraping.
+** Alternatives
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 19:26]
+:END:
+- [[https://github.com/floscr/org-media-info][org-media-info]]: Creates an Org entry instead of producing the content of a dynamic block
 ** License
 :PROPERTIES:
 :CREATED_TIME: [2021-02-14 Sun 14:08]
