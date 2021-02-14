@@ -1,0 +1,102 @@
+* org-volume
+This package provides Org dynamic blocks for metadata of volumes of
+media such as books.
+
+It retrieves information from web sites and APIs and insert it into
+a block in Org. It builds a search query from the closest Org
+heading in the context.
+
+It also provides a command for updating the current Org entry from
+the retrieved information. For example, it can update the heading
+to match the accurate title of the volume, add a tag to denote the
+format, and set entry properties which will be convenient for
+scripting.
+
+Out of the box it supports retrieving information of books using
+Google Books API v1.
+
+It is designed to be extensible, so you can add custom media types
+and metadata providers. For example, it would be possible to add
+providers for video, music, etc.
+# Add CI badges here
+
+#+BEGIN_HTML
+#+END_HTML
+** Table of contents
+:PROPERTIES:
+:TOC: siblings
+:END:
+-  [[#installation][Installation]]
+-  [[#usage][Usage]]
+  -  [[#books-via-google-books-api][Books (via Google Books API)]]
+    -  [[#retrieving-metadata-for-the-heading][Retrieving metadata for the heading]]
+    -  [[#updating-the-org-entry][Updating the Org entry]]
+    -  [[#inserting-the-table-of-contents-of-the-book][Inserting the table of contents of the book]]
+-  [[#license][License]]
+
+** Installation
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 14:07]
+:END:
+This package is not available from MELPA yet.
+** Usage
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 14:08]
+:END:
+At present, =org-volume= package only provides a built-in support for Google Books API v1.
+You can add other providers by adding entries to =org-volume-site-alist= variable.
+*** Books (via Google Books API)
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 14:15]
+:END:
+**** Retrieving metadata for the heading
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 14:09]
+:END:
+To insert the metadata of a title, create a =volume= dynamic block:
+
+#+begin_src org
+  ,#+begin: volume
+  ,#+end:
+#+end_src
+
+If you run =C-c C-c= on the block, it retrieves information from the default site, i.e. Google Books, and insert a list into the block.
+**** Updating the Org entry
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 14:12]
+:END:
+Once you generate the =volume= block, you can update the Org entry from the metadata.
+
+If you run =org-volume-update-entry-from-dblock= on the block, the entry is updated as follows:
+
+1. The heading is updated to the title + subtitle (if any).
+2. =book= tag is added to the headline.
+3. Some properties, e.g. the ISBN code of the book, are added.
+4. It inserts a thumbnail before the dynamic block.
+**** Inserting the table of contents of the book
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 14:15]
+:END:
+After you update the Org entry, you can optionally add the table of contents (TOC) of the book
+if it is published from one of the supported publishers.
+At present, only Pragmatic Bookshelf is supported.
+
+To insert a TOC, create a =volume-toc= dynamic block in the same entry as the =volume= block:
+
+#+begin_src org
+  ,#+begin: volume-toc
+  ,#+end:
+#+end_src
+
+It must reside under the same Org headline, and it doesn't work inside subtrees.
+
+When you run =C-c C-c= on the dynamic block, it finds a web page for the title on the publisher's web site, scrape the web page, and extract and insert the TOC into the block.
+
+You can add support for more publishers by extending =org-volume-publisher-site-list=.
+Some publishers may block bots from accessing their web sites, so you cannot retrieve TOCs for books from those publishers.
+Also check terms of use of the web sites you consider scraping and stick with common practices of ethical web scraping.
+** License
+:PROPERTIES:
+:CREATED_TIME: [2021-02-14 Sun 14:08]
+:END:
+GPL v3
