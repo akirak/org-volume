@@ -1,4 +1,10 @@
 * org-volume
+#+BEGIN_HTML
+<a href="https://github.com/akirak/org-volume/actions?query=workflow%3ACI">
+<img src="https://github.com/akirak/org-volume/workflows/CI/badge.svg">
+</a>
+#+END_HTML
+
 This package provides Org dynamic blocks for metadata of volumes of
 medium such as books.
 
@@ -18,10 +24,6 @@ Google Books API v1.
 It is designed to be extensible, so you can add custom media types
 and metadata providers. For example, it would be possible to add
 providers for video, music, etc.
-# Add CI badges here
-
-#+BEGIN_HTML
-#+END_HTML
 ** Table of contents
 :PROPERTIES:
 :TOC: siblings
