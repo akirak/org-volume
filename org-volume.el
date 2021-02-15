@@ -28,11 +28,11 @@
 ;;; Commentary:
 
 ;; This package provides Org dynamic blocks for metadata of volumes of
-;; media such as books.
-;; 
+;; medium such as books.
+;;
 ;; It retrieves information from web sites and APIs and insert it into
-;; a block in Org. It builds a search query from the closest Org
-;; heading in the context.
+;; a block in Org. It builds a search query from the current Org
+;; entry.
 ;;
 ;; It also provides a command for updating the current Org entry from
 ;; the retrieved information. For example, it can update the heading

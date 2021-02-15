@@ -1,10 +1,10 @@
 * org-volume
 This package provides Org dynamic blocks for metadata of volumes of
-media such as books.
+medium such as books.
 
 It retrieves information from web sites and APIs and insert it into
-a block in Org. It builds a search query from the closest Org
-heading in the context.
+a block in Org. It builds a search query from the current Org
+entry.
 
 It also provides a command for updating the current Org entry from
 the retrieved information. For example, it can update the heading
@@ -79,7 +79,7 @@ If you run =org-volume-update-entry-from-dblock= on the block, the entry is upda
 :END:
 After you update the Org entry, you can optionally add the table of contents (TOC) of the book
 if it is published from one of the supported publishers.
-At present, only Pragmatic Bookshelf is supported.
+At present, only [[https://pragprog.com/][Pragmatic Bookshelf]] is supported.
 
 To insert a TOC, create a =volume-toc= dynamic block in the same entry as the =volume= block:
 
@@ -93,13 +93,17 @@ It must reside under the same Org headline, and it doesn't work inside subtrees.
 When you run =C-c C-c= on the dynamic block, it finds a web page for the title on the publisher's web site, scrape the web page, and extract and insert the TOC into the block.
 
 You can add support for more publishers by extending =org-volume-publisher-site-list=.
-Some publishers may block bots from accessing their web sites, so you cannot retrieve TOCs for books from those publishers.
-Also check terms of use of the web sites you consider scraping and stick with common practices of ethical web scraping.
+Some publishers may prevent bots from accessing their web sites, so you cannot retrieve TOCs of books from those publishers.
+
+When you scrape data from websites, make sure that you remain a good developer:
+
+- Check Terms of Use of the web site you are trying to scrape.
+- Stick with common practices of ethical web scraping.
 ** Alternatives
 :PROPERTIES:
 :CREATED_TIME: [2021-02-14 Sun 19:26]
 :END:
-- [[https://github.com/floscr/org-media-info][org-media-info]]: Creates an Org entry instead of producing the content of a dynamic block
+- [[https://github.com/floscr/org-media-info][org-media-info]] creates an Org entry instead of producing the content of a dynamic block.
 ** License
 :PROPERTIES:
 :CREATED_TIME: [2021-02-14 Sun 14:08]
