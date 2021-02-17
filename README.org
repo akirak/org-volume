@@ -63,6 +63,18 @@ To insert the metadata of a title, create a =volume= dynamic block:
 #+end_src
 
 If you run =C-c C-c= on the block, it retrieves information from the default site, i.e. Google Books, and insert a list into the block.
+
+By default, the search query is built from the heading of the Org entry.
+Alternatively, you can explicitly set a query as =:q= parameter of the block.
+
+Multiple search results can be inserted into the block, but if you set
+=:limit= to 1 in the block header, it lets you select a candidate
+interactively.
+
+It also supports =:lang= parameter which can be used to set the language.
+The default value is ="en"=, which stands for English.
+
+You can override the default parameters by customizing =org-volume-dblock-defaults= variable.
 **** Updating the Org entry
 :PROPERTIES:
 :CREATED_TIME: [2021-02-14 Sun 14:12]
