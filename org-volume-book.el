@@ -59,6 +59,7 @@ PARAMS is a plist. It supports the following parameters:
   result based the actual Org output."
   (let ((query (plist-get params :q))
         (lang (plist-get params :lang))
+        (limit (plist-get params :limit))
         (post-filter (plist-get params :filter))
         (endpoint org-volume-google-books-v1-api-endpoint))
     (request endpoint
@@ -70,14 +71,28 @@ PARAMS is a plist. It supports the following parameters:
       :complete
       (cl-function
        (lambda (&key data &allow-other-keys)
-         (dolist (item (alist-get 'items data))
-           (let ((start (point)))
-             (org-volume--google-books-insert-item item)
-             (when (and post-filter
-                        (not (string-match-p (regexp-quote post-filter)
-                                             (buffer-substring-no-properties start (point)))))
-               (delete-region start (point)))))
+         (let ((items (alist-get 'items data)))
+           (dolist (item (pcase limit
+                           (1 (list (org-volume--completing-read-with-format
+                                     (format "Select a book for \"%s\": " query)
+                                     items #'org-volume--google-book-format)))
+                           ((pred numberp) (-take limit items))
+                           (_ items)))
+             (let ((start (point)))
+               (org-volume--google-books-insert-item item)
+               (when (and post-filter
+                          (not (string-match-p (regexp-quote post-filter)
+                                               (buffer-substring-no-properties start (point)))))
+                 (delete-region start (point))))))
          (backward-delete-char 2))))))
+
+(defun org-volume--google-book-format (item)
+  "Format ITEM for display in `completing-read'."
+  (let-alist (alist-get 'volumeInfo item)
+    (format "%s from %s by %s"
+            \.title
+            (or \.publisher "nil")
+            (string-join \.authors ", "))))
 
 (defun org-volume--google-books-insert-item (item)
   "Insert information on an ITEM."
