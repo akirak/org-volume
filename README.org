@@ -24,6 +24,11 @@ Google Books API v1.
 It is designed to be extensible, so you can add custom media types
 and metadata providers. For example, it would be possible to add
 providers for video, music, etc.
+# Add CI badges here
+
+#+BEGIN_HTML
+#+END_HTML
+[[file:screenshots/screenshot-1.svg]]
 ** Table of contents
 :PROPERTIES:
 :TOC: siblings
