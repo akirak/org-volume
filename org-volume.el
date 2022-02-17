@@ -179,9 +179,9 @@ PARAMS is a plist, as in other dynamic block definitions."
                         (when (re-search-forward (concat "^" (regexp-quote (format "- %s :: " key)))
                                                  nil end)
                           (buffer-substring-no-properties (point) (line-end-position))))))
-          (when org-volume-use-org-download
-            (unless (f-directory-p org-download-image-dir)
-              (make-directory org-download-image-dir)))
+          (when (and (eq org-volume-image-download-method 'org-download)
+                     (not (f-directory-p org-download-image-dir)))
+            (make-directory org-download-image-dir))
           (when-let (title (getprop "Title"))
             (org-entry-put nil "VOLUME_TITLE" title)
             (if-let (subtitle (getprop "Subtitle"))
