@@ -1,9 +1,5 @@
 * org-volume
-#+BEGIN_HTML
-<a href="https://github.com/akirak/org-volume/actions?query=workflow%3ACI">
-<img src="https://github.com/akirak/org-volume/workflows/CI/badge.svg">
-</a>
-#+END_HTML
+[[https://github.com/akirak/org-volume/actions/workflows/lint.yml][file:https://github.com/akirak/org-volume/actions/workflows/lint.yml/badge.svg]]
 
 This package provides Org dynamic blocks for metadata of volumes of
 medium such as books.
