@@ -1,4 +1,11 @@
 * Terraform in Action
+This is an example where a query is built according to the heading.
+
 Press =C-c C-c= on this dblock, and pick a volume. Then run =org-volume-update-entry-from-dblock=.
 #+begin: volume
+#+end:
+* 
+There is no heading here, but =:q= parameter specifies the query body instead.
+#+begin: volume :q "Managing Kubernetes"
+
 #+end:
