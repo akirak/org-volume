@@ -56,9 +56,12 @@
 (require 'dash)
 (require 'org)
 (require 'ol)
-(require 'org-download)
 (require 'request)
 (require 'f)
+
+(defvar org-download-image-dir)
+(defvar org-download-heading-lvl)
+(declare-function org-download-image "ext:org-download")
 
 (defgroup org-volume nil
   "Metadata management for Org."
@@ -98,6 +101,13 @@ default site by context."
 (defcustom org-volume-toc-dblock-defaults nil
   "Default parameters for the \"volume-toc\" dynamic block."
   :type 'plist)
+
+(defcustom org-volume-image-download-method
+  (when (require 'org-download nil t)
+    'org-download)
+  "Method used to download thumbnail images from URLs."
+  :type '(choice (const :tag "Use org-download package" org-download)
+                 (const :tag "Don't download images" nil)))
 
 ;;;; Dynamic blocks
 
@@ -169,8 +179,9 @@ PARAMS is a plist, as in other dynamic block definitions."
                         (when (re-search-forward (concat "^" (regexp-quote (format "- %s :: " key)))
                                                  nil end)
                           (buffer-substring-no-properties (point) (line-end-position))))))
-          (unless (f-directory-p org-download-image-dir)
-            (make-directory org-download-image-dir))
+          (when org-volume-use-org-download
+            (unless (f-directory-p org-download-image-dir)
+              (make-directory org-download-image-dir)))
           (when-let (title (getprop "Title"))
             (org-entry-put nil "VOLUME_TITLE" title)
             (if-let (subtitle (getprop "Subtitle"))
@@ -186,15 +197,17 @@ PARAMS is a plist, as in other dynamic block definitions."
               (let ((tags (org-get-tags nil t)))
                 (org-set-tags (-uniq (cons (downcase type) tags))))))
           (when-let (thumbnail (getprop "Thumbnail"))
-            (let ((org-download-image-dir (f-join (f-dirname (buffer-file-name)) "image/"))
-                  (org-download-heading-lvl nil)
-                  (pos (point)))
-              (save-excursion
-                (org-back-to-heading)
-                (if (re-search-forward (rx bol "#+DOWNLOADED:") pos t)
-                    (delete-region (line-beginning-position) pos)
-                  (goto-char pos))
-                (org-download-image thumbnail)))))))))
+            (cl-case org-volume-image-download-method
+              (org-download
+               (let ((org-download-image-dir (f-join (f-dirname (buffer-file-name)) "image/"))
+                     (org-download-heading-lvl nil)
+                     (pos (point)))
+                 (save-excursion
+                   (org-back-to-heading)
+                   (if (re-search-forward (rx bol "#+DOWNLOADED:") pos t)
+                       (delete-region (line-beginning-position) pos)
+                     (goto-char pos))
+                   (org-download-image thumbnail)))))))))))
 
 ;;;; Internal functions
 
