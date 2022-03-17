@@ -118,6 +118,7 @@ When you scrape data from websites, make sure that you remain a good developer:
 :PROPERTIES:
 :CREATED_TIME: [2021-02-14 Sun 19:26]
 :END:
+- [[https://github.com/yantar92/org-capture-ref][org-capture-ref]] lets you insert citation information using org-capture and supports various backends. I didn't know of it when I wrote org-volume, but you should have a look at it instead.
 - [[https://github.com/floscr/org-media-info][org-media-info]] creates an Org entry instead of producing the content of a dynamic block.
 ** License
 :PROPERTIES:
