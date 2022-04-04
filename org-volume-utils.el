@@ -46,17 +46,18 @@
 (defun org-volume--parse-bibtex ()
   "Parse the BibTeX entry in the buffer."
   (goto-char (point-min))
-  (cl-labels ((parse-tag
-               (raw)
-               (save-match-data
-                 (cond
-                  ((string-match (rx bol "{" (group (+ anything)) "}" eol) raw)
-                   (pcase (->> (split-string (match-string 1 raw) ",")
-                               (-map #'string-trim))
-                     (`(,single) single)
-                     (xs xs)))
-                  (t
-                   raw)))))
+  (cl-flet
+      ((parse-tag
+         (raw)
+         (save-match-data
+           (cond
+            ((string-match (rx bol "{" (group (+ anything)) "}" eol) raw)
+             (pcase (->> (split-string (match-string 1 raw) ",")
+                         (-map #'string-trim))
+               (`(,single) single)
+               (xs xs)))
+            (t
+             raw)))))
     (-map (pcase-lambda (`(,key . ,value))
             (cons key (parse-tag value)))
           (bibtex-parse-entry))))

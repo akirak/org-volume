@@ -174,7 +174,7 @@ PARAMS is a plist, as in other dynamic block definitions."
       (org-show-entry)
       (let ((end (save-excursion
                    (re-search-forward org-dblock-end-re nil t))))
-        (cl-labels
+        (cl-flet
             ((getprop (key)
                (save-excursion
                  (when (re-search-forward (concat "^" (regexp-quote (format "- %s :: " key)))

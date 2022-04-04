@@ -105,7 +105,7 @@ PARAMS is a plist. It supports the following parameters:
          (isbn10 (-some->> identifiers
                    (-find (lambda (al) (string= "ISBN_10" (alist-get 'type al))))
                    (alist-get 'identifier))))
-    (cl-labels
+    (cl-flet
         ((dl (key value) (when value (insert (format "- %s :: %s\n"
                                                      (->> (format "%s" key)
                                                           (replace-regexp-in-string "-" " ")
