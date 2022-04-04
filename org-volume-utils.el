@@ -70,13 +70,12 @@ This is a wrapper around `completing-read'.
 
 PROMPT is a string, and ITEMS can be a list of any data.
 FORMATTER is used to format each item in the candidates."
-  (let ((choice (completing-read prompt
-                                 (-map (lambda (x)
-                                         (propertize (funcall formatter x)
-                                                     'item x))
-                                       items)
-                                 nil t)))
-    (get-char-property 0 'item choice)))
+  (let* ((items (mapcar (lambda (x)
+                          (cons (funcall formatter x) x))
+                        items))
+         (choice (completing-read prompt (mapcar #'car items)
+                                  nil t)))
+    (cdr (assoc choice items))))
 
 ;;;; Request helpers
 
