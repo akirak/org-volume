@@ -1,6 +1,6 @@
 ;;; org-volume.el --- Retrieve metadata of volumes from inside Org -*- lexical-binding: t -*-
 
-;; Copyright (C) 2021 Akira Komamura
+;; Copyright (C) 2021-2022 Akira Komamura
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
 ;; Version: 0.1
