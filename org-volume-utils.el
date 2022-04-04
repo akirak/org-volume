@@ -46,17 +46,18 @@
 (defun org-volume--parse-bibtex ()
   "Parse the BibTeX entry in the buffer."
   (goto-char (point-min))
-  (cl-labels ((parse-tag
-               (raw)
-               (save-match-data
-                 (cond
-                  ((string-match (rx bol "{" (group (+ anything)) "}" eol) raw)
-                   (pcase (->> (split-string (match-string 1 raw) ",")
-                               (-map #'string-trim))
-                     (`(,single) single)
-                     (xs xs)))
-                  (t
-                   raw)))))
+  (cl-flet
+      ((parse-tag
+         (raw)
+         (save-match-data
+           (cond
+            ((string-match (rx bol "{" (group (+ anything)) "}" eol) raw)
+             (pcase (->> (split-string (match-string 1 raw) ",")
+                         (-map #'string-trim))
+               (`(,single) single)
+               (xs xs)))
+            (t
+             raw)))))
     (-map (pcase-lambda (`(,key . ,value))
             (cons key (parse-tag value)))
           (bibtex-parse-entry))))
@@ -70,13 +71,12 @@ This is a wrapper around `completing-read'.
 
 PROMPT is a string, and ITEMS can be a list of any data.
 FORMATTER is used to format each item in the candidates."
-  (let ((choice (completing-read prompt
-                                 (-map (lambda (x)
-                                         (propertize (funcall formatter x)
-                                                     'item x))
-                                       items)
-                                 nil t)))
-    (get-char-property 0 'item choice)))
+  (let* ((items (mapcar (lambda (x)
+                          (cons (funcall formatter x) x))
+                        items))
+         (choice (completing-read prompt (mapcar #'car items)
+                                  nil t)))
+    (cdr (assoc choice items))))
 
 ;;;; Request helpers
 
