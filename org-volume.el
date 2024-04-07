@@ -160,6 +160,29 @@ PARAMS is a plist, as in other dynamic block definitions."
                 :title title)
              (error "No publisher data is available for %s" isbn))))))))
 
+;;;###autoload
+(defun org-volume-insert-dblock-volume ()
+  "Create a dynamic block with data by web scraping."
+  (interactive)
+  (org-create-dblock
+   (list :name "volume"
+         :q (read-string "[org-volume] :q query: ")
+         :limit 1
+         :lang "en"))
+  (org-update-dblock))
+
+;;;###autoload
+(defun org-volume-insert-dblock-volume-toc ()
+  "Create a dynamic block with data by web scraping."
+  (interactive)
+  (org-create-dblock (list :name "volume-toc"))
+  (org-update-dblock))
+
+;;;###autoload
+(with-eval-after-load 'org
+  (org-dynamic-block-define "volume" #'org-volume-insert-dblock-volume)
+  (org-dynamic-block-define "volume-toc" #'org-volume-insert-dblock-volume-toc))
+
 ;;;; Convenient commands for the user
 
 ;;;###autoload
