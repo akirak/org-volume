@@ -1,0 +1,53 @@
+{
+  "dash": {
+    "author": "Magnar Sveen <magnars@gmail.com>",
+    "meta": {
+      "description": "A modern list library for Emacs"
+    },
+    "narHash": "sha256-at42NCcdF9g7a55asnOCSqsvG+XhWuvVsHFT6kU9f9o=",
+    "packageRequires": {
+      "emacs": "24"
+    },
+    "version": "2.19.1"
+  },
+  "f": {
+    "author": "Johan Andersson <johan.rejeep@gmail.com>",
+    "meta": {
+      "description": "Modern API for working with files and directories",
+      "maintainers": [
+        "Lucien Cartier-Tilet <lucien@phundrak.com>"
+      ]
+    },
+    "narHash": "sha256-uBVLkcVx7gQsFeF4GegDaRB3PJPTZKVhoGvLbfmT6x4=",
+    "packageRequires": {
+      "dash": "2.2.0",
+      "emacs": "24.1",
+      "s": "1.7.0"
+    },
+    "version": "0.20.0"
+  },
+  "request": {
+    "author": "Takafumi Arakaki <aka.tkf at gmail.com>",
+    "meta": {
+      "description": "Compatible layer for URL request",
+      "homepage": "https://github.com/tkf/emacs-request"
+    },
+    "narHash": "sha256-WOaAoM44yF0E9o0G3NoN198i7l5fGnBJwNCGtbyWMKs=",
+    "packageRequires": {
+      "emacs": "24.4"
+    },
+    "version": "0.3.3"
+  },
+  "s": {
+    "author": "Magnar Sveen <magnars@gmail.com>",
+    "meta": {
+      "description": "The long lost Emacs string manipulation library.",
+      "maintainers": [
+        "Jason Milkins <jasonm23@gmail.com>"
+      ]
+    },
+    "narHash": "sha256-fbF/SyPwEiJICaPBq0xWj2yLWjdNwkaLF2iYvZ2EO1k=",
+    "packageRequires": {},
+    "version": "1.13.1"
+  }
+}
