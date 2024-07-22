@@ -4,7 +4,7 @@
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((emacs "27.1") (dash "2.13") (request "0.3.2") (f "0.20"))
+;; Package-Requires: ((emacs "28.1") (org "9.6") (dash "2.13") (request "0.3.2") (f "0.20"))
 ;; Keywords: outlines hypermedia
 ;; URL: https://github.com/akirak/org-volume
 
