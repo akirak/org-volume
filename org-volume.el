@@ -224,14 +224,16 @@ PARAMS is a plist, as in other dynamic block definitions."
               (let ((pos (point)))
                 (save-excursion
                   (org-back-to-heading)
-                  (if (re-search-forward (rx bol "#+DOWNLOADED:") pos t)
+                  (if (re-search-forward (rx bol "#+DOWNLOADED:" (* blank)) pos t)
                       (delete-region (line-beginning-position) pos)
                     (goto-char pos))
-                  (pcase org-volume-image-download-method
-                    (`org-download
-                     (org-volume--org-download-image url))
-                    ((pred functionp)
-                     (funcall org-volume-image-download-method url))))))))))))
+                  (when-let (url (when (looking-at url-handler-regexp)
+                                   (match-string 0)))
+                    (pcase org-volume-image-download-method
+                      (`org-download
+                       (org-volume--org-download-image url))
+                      ((pred functionp)
+                       (funcall org-volume-image-download-method url)))))))))))))
 
 (defun org-volume--org-download-image (url)
   "Insert a link to an image at URL using `org-download'."
