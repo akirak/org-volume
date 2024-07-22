@@ -84,7 +84,7 @@ PARAMS is a plist. It supports the following parameters:
                           (not (string-match-p (regexp-quote post-filter)
                                                (buffer-substring-no-properties start (point)))))
                  (delete-region start (point))))))
-         (backward-delete-char 2))))))
+         (delete-char 2))))))
 
 (defun org-volume--google-book-format (item)
   "Format ITEM for display in `completing-read'."
