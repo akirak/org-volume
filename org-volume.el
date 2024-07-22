@@ -62,6 +62,8 @@
 (defvar org-download-image-dir)
 (defvar org-download-heading-lvl)
 (declare-function org-download-image "ext:org-download")
+(declare-function org-fold-show-entry "ext:org-fold")
+(defvar url-handler-regexp)
 
 (defgroup org-volume nil
   "Metadata management for Org."
@@ -194,7 +196,7 @@ PARAMS is a plist, as in other dynamic block definitions."
     (unless (looking-at org-dblock-start-re)
       (user-error "You have to start on the beginning of a dynamic block"))
     (org-save-outline-visibility t
-      (org-show-entry)
+      (org-fold-show-entry)
       (let ((end (save-excursion
                    (re-search-forward org-dblock-end-re nil t))))
         (cl-flet
